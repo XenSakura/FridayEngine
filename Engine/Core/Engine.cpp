@@ -11,8 +11,6 @@ void Engine::Update()
 	std::chrono::duration<float> deltaTime = currentTime - prevTime;
 	float dt = deltaTime.count();
 
-
-
 	prevTime = currentTime;
 }
 
