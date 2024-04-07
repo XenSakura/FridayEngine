@@ -104,7 +104,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Libraries\glm;$(SolutionDir)Libraries\glfw;$(SolutionDir)Engine\Core;$(SolutionDir)Engine\Graphics;$(SolutionDir)Engine\Physics;$(SolutionDir)Libraries\Vulkan;$(SolutionDir)Libraries\imgui-master;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Libraries\glm;$(SolutionDir)Libraries\glfw-3.4;$(SolutionDir)Engine\Core;$(SolutionDir)Engine\Graphics;$(SolutionDir)Engine\Physics;$(SolutionDir)Libraries\Vulkan;$(SolutionDir)Libraries\imgui-master;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
