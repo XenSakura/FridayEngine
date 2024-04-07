@@ -1,136 +1,38 @@
 // FridayEngine.cpp : Defines the entry point for the application.
 //
 
-#include "framework.h"
-#include "FridayEngine.h"
-#include "Engine.h"
+#define GLFW_INCLUDE_VULKAN
+#include <../GLFW/glfw3.h>
 
-#define MAX_LOADSTRING 100
+#define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#include <../glm/vec4.hpp>
+#include <../glm/mat4x4.hpp>
 
-HINSTANCE hInst;
-WCHAR szTitle[MAX_LOADSTRING];
-WCHAR szWindowClass[MAX_LOADSTRING];
+#include <iostream>
 
-ATOM MyRegisterClass(HINSTANCE hInstance);
-BOOL InitInstance(HINSTANCE, int);
-LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
-INT_PTR CALLBACK About(HWND, UINT, WPARAM, LPARAM);
+int main() {
+    glfwInit();
 
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-    _In_opt_ HINSTANCE hPrevInstance,
-    _In_ LPWSTR    lpCmdLine,
-    _In_ int       nCmdShow)
-{
-    UNREFERENCED_PARAMETER(hPrevInstance);
-    UNREFERENCED_PARAMETER(lpCmdLine);
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+    GLFWwindow* window = glfwCreateWindow(800, 600, "Vulkan window", nullptr, nullptr);
 
-    LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
-    LoadStringW(hInstance, IDC_FRIDAYENGINE, szWindowClass, MAX_LOADSTRING);
-    MyRegisterClass(hInstance);
+    uint32_t extensionCount = 0;
+    vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
 
-    if (!InitInstance(hInstance, nCmdShow))
-    {
-        return FALSE;
-    }
-    Engine engineInstance;
-    MSG msg;
-    while (GetMessage(&msg, nullptr, 0, 0))
-    {
-        engineInstance.Update();
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
+    std::cout << extensionCount << " extensions supported\n";
+
+    glm::mat4 matrix;
+    glm::vec4 vec;
+    auto test = matrix * vec;
+
+    while (!glfwWindowShouldClose(window)) {
+        glfwPollEvents();
     }
 
-    return (int)msg.wParam;
-}
+    glfwDestroyWindow(window);
 
-ATOM MyRegisterClass(HINSTANCE hInstance)
-{
-    WNDCLASSEXW wcex;
-    wcex.cbSize = sizeof(WNDCLASSEX);
-    wcex.style = CS_HREDRAW | CS_VREDRAW;
-    wcex.lpfnWndProc = WndProc;
-    wcex.cbClsExtra = 0;
-    wcex.cbWndExtra = 0;
-    wcex.hInstance = hInstance;
-    wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_FRIDAYENGINE));
-    wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
-    wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-    wcex.lpszMenuName = MAKEINTRESOURCEW(IDC_FRIDAYENGINE);
-    wcex.lpszClassName = szWindowClass;
-    wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
+    glfwTerminate();
 
-    return RegisterClassExW(&wcex);
-}
-
-BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
-{
-    hInst = hInstance;
-
-    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-        CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
-
-    if (!hWnd)
-    {
-        return FALSE;
-    }
-
-    ShowWindow(hWnd, nCmdShow);
-    UpdateWindow(hWnd);
-
-    return TRUE;
-}
-
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    switch (message)
-    {
-    case WM_COMMAND:
-    {
-        int wmId = LOWORD(wParam);
-        switch (wmId)
-        {
-        case IDM_ABOUT:
-            DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
-            break;
-        case IDM_EXIT:
-            DestroyWindow(hWnd);
-            break;
-        default:
-            return DefWindowProc(hWnd, message, wParam, lParam);
-        }
-    }
-    break;
-    case WM_PAINT:
-    {
-        PAINTSTRUCT ps;
-        HDC hdc = BeginPaint(hWnd, &ps);
-        EndPaint(hWnd, &ps);
-    }
-    break;
-    case WM_DESTROY:
-        PostQuitMessage(0);
-        break;
-    default:
-        return DefWindowProc(hWnd, message, wParam, lParam);
-    }
     return 0;
-}
-
-INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    UNREFERENCED_PARAMETER(lParam);
-    switch (message)
-    {
-    case WM_INITDIALOG:
-        return (INT_PTR)TRUE;
-    case WM_COMMAND:
-        if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
-        {
-            EndDialog(hDlg, LOWORD(wParam));
-            return (INT_PTR)TRUE;
-        }
-        break;
-    }
-    return (INT_PTR)FALSE;
 }
