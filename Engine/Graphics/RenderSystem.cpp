@@ -1,17 +1,17 @@
 #include "RenderSystem.h"
 
-void RenderSystem::Init()
+RenderSystem::RenderSystem()
 {
 	
 }
+
 
 void RenderSystem::Update(float dt)
 {
 	
 }
 
-void RenderSystem::Exit()
+RenderSystem::~RenderSystem()
 {
 	
 }
-

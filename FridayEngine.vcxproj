@@ -104,11 +104,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Libraries\glm;$(SolutionDir)Libraries\glfw-3.4;$(SolutionDir)Engine\Core;$(SolutionDir)Engine\Graphics;$(SolutionDir)Engine\Physics;$(SolutionDir)Libraries\Vulkan;$(SolutionDir)Libraries\imgui-master;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.280.0\Include;$(SolutionDir)Libraries\glm;$(SolutionDir)Libraries\glfw-3.4\include;$(SolutionDir)Engine\Core;$(SolutionDir)Engine\Graphics;$(SolutionDir)Engine\Physics;$(SolutionDir)Libraries\imgui-master;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>glfw3.lib;vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\VulkanSDK\1.3.280.0\Lib;$(SolutionDir)Libraries\glfw-3.4\lib-vc2022;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -130,6 +132,7 @@
   <ItemGroup>
     <ClInclude Include="Engine\Core\Engine.h" />
     <ClInclude Include="Engine\Core\FridayEngine.h" />
+    <ClInclude Include="Engine\Graphics\HeartRenderer.h" />
     <ClInclude Include="Engine\Graphics\RenderSystem.h" />
   </ItemGroup>
   <ItemGroup>
@@ -142,6 +145,7 @@
   <ItemGroup>
     <ClCompile Include="Engine\Core\Engine.cpp" />
     <ClCompile Include="Engine\Core\FridayEngine.cpp" />
+    <ClCompile Include="Engine\Graphics\HeartRenderer.cpp" />
     <ClCompile Include="Engine\Graphics\RenderSystem.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
