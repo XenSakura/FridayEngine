@@ -1,12 +1,11 @@
 #pragma once
 
-class RenderSystem
+namespace RenderSystem
 {
-public:
-	RenderSystem();
+	void Init();
 
 	void Update(float dt);
 
-	~RenderSystem();
+	void Exit();
 
-};
+}
