@@ -75,4 +75,6 @@ private:
     void SetupDebugMessenger();
 
     void PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
+
+    void PickPhysicalDevice();
 };
