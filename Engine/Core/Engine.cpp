@@ -19,6 +19,7 @@ Engine::Engine()
     renderInstance(std::make_unique<RenderSystem>())
 {
     GLFWSetup();
+    VulkanSetup();
 }
 
 /**
