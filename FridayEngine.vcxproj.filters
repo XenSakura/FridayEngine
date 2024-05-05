@@ -39,6 +39,9 @@
     <ClInclude Include="Engine\Graphics\RenderSystem.h">
       <Filter>Engine\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Graphics\VulkanRenderAPI.h">
+      <Filter>Engine\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="FridayEngine.rc">
@@ -61,6 +64,9 @@
       <Filter>Engine\Core</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Graphics\RenderSystem.cpp">
+      <Filter>Engine\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Graphics\VulkanRenderAPI.cpp">
       <Filter>Engine\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
