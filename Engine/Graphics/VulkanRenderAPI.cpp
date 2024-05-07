@@ -6,6 +6,7 @@
 #include <optional>
 #include <fstream>
 #include <glm/glm.hpp>
+#include <array>
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
@@ -27,7 +28,41 @@ struct SwapChainSupportDetails
     std::vector<VkPresentModeKHR> presentModes;
 };
 
+struct Vertex
+{
+    glm::vec2 pos;
+    glm::vec3 color;
 
+    static VkVertexInputBindingDescription getBindingDescription()
+    {
+        VkVertexInputBindingDescription bindingDescription{};
+        bindingDescription.binding = 0;
+        bindingDescription.stride = sizeof(Vertex);
+        bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+        return bindingDescription;
+    }
+    static std::array<VkVertexInputAttributeDescription, 2> getAttributeDescriptions() 
+    {
+        std::array<VkVertexInputAttributeDescription, 2> attributeDescriptions{};
+
+        attributeDescriptions[0].binding = 0;
+        attributeDescriptions[0].location = 0;
+        attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
+        attributeDescriptions[0].offset = offsetof(Vertex, pos);
+
+        attributeDescriptions[1].binding = 0;
+        attributeDescriptions[1].location = 1;
+        attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
+        attributeDescriptions[1].offset = offsetof(Vertex, color);
+        return attributeDescriptions;
+    }
+};
+
+const std::vector<Vertex> vertices = {
+    {{0.0f, -0.5f}, {1.0f, 1.0f, 1.0f}},
+    {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
+    {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
+};
 //Function declarations
 VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData);
 void PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
@@ -58,6 +93,8 @@ void CreateSyncObjects(RenderData& data);
 void RecreateSwapChain(RenderData& data);
 void CleanupSwapChain(RenderData& data);
 static void FramebufferResizeCallback(GLFWwindow* window, int width, int height);
+void CreateVertexBuffer(RenderData& data);
+uint32_t findMemoryType(RenderData& data, uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
 const std::vector<const char*> validationLayers = { "VK_LAYER_KHRONOS_validation" };
 const std::vector<const char*> deviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
@@ -124,6 +161,7 @@ void VulkanSetup(RenderData& data)
     CreateGraphicsPipeline(data);
     CreateFrameBuffers(data);
     CreateCommandPool(data);
+    CreateVertexBuffer(data);
     CreateCommandBuffers(data);
     CreateSyncObjects(data);
 }
@@ -137,6 +175,9 @@ void VulkanCleanup(RenderData& data)
 {
     vkDeviceWaitIdle(data.device);
     CleanupSwapChain(data);
+
+    vkDestroyBuffer(data.device, data.vertexBuffer, nullptr);
+    vkFreeMemory(data.device, data.vertexBufferMemory, nullptr);
 
     vkDestroyPipeline(data.device, data.graphicsPipeline, nullptr);
     vkDestroyPipelineLayout(data.device, data.pipelineLayout, nullptr);
@@ -754,8 +795,14 @@ void CreateGraphicsPipeline(RenderData& data)
     // Configure pipeline vertex input state
     VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    vertexInputInfo.vertexBindingDescriptionCount = 0;
-    vertexInputInfo.vertexAttributeDescriptionCount = 0;
+    
+    auto bindingDescription = Vertex::getBindingDescription();
+    auto attributeDescriptions = Vertex::getAttributeDescriptions();
+
+    vertexInputInfo.vertexBindingDescriptionCount = 1;
+    vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+    vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
+    vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
 
     // Configure pipeline input assembly state
     VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
@@ -1045,29 +1092,32 @@ void RecordCommandBuffer(RenderData& data, VkCommandBuffer commandBuffer, uint32
     renderPassInfo.pClearValues = &clearColor;
 
     vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+        // Bind graphics pipeline
+        vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, data.graphicsPipeline);
 
-    // Bind graphics pipeline
-    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, data.graphicsPipeline);
+        // Set viewport
+        VkViewport viewport{};
+        viewport.x = 0.0f;
+        viewport.y = 0.0f;
+        viewport.width = (float)data.swapChainExtent.width;
+        viewport.height = (float)data.swapChainExtent.height;
+        viewport.minDepth = 0.0f;
+        viewport.maxDepth = 1.0f;
+        vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
 
-    // Set viewport
-    VkViewport viewport{};
-    viewport.x = 0.0f;
-    viewport.y = 0.0f;
-    viewport.width = (float)data.swapChainExtent.width;
-    viewport.height = (float)data.swapChainExtent.height;
-    viewport.minDepth = 0.0f;
-    viewport.maxDepth = 1.0f;
-    vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
+        // Set scissor
+        VkRect2D scissor{};
+        scissor.offset = { 0, 0 };
+        scissor.extent = data.swapChainExtent;
+        vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-    // Set scissor
-    VkRect2D scissor{};
-    scissor.offset = { 0, 0 };
-    scissor.extent = data.swapChainExtent;
-    vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-    // Draw
-    vkCmdDraw(commandBuffer, 3, 1, 0, 0);
+        VkBuffer vertexBuffers[] = { data.vertexBuffer };
+        VkDeviceSize offsets[] = { 0 };
+        vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 
+        vkCmdDraw(commandBuffer, static_cast<uint32_t>(vertices.size()), 1, 0, 0);
+   
     // End render pass
     vkCmdEndRenderPass(commandBuffer);
 
@@ -1179,6 +1229,59 @@ void CleanupSwapChain(RenderData& data)
     }
 
     vkDestroySwapchainKHR(data.device, data.swapChain, nullptr);
+}
+
+void CreateVertexBuffer(RenderData& data)
+{
+    VkBufferCreateInfo bufferInfo{};
+    bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    bufferInfo.size = sizeof(vertices[0]) * vertices.size();
+
+    bufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+
+    bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+    if (vkCreateBuffer(data.device, &bufferInfo, nullptr, &data.vertexBuffer) != VK_SUCCESS) 
+    {
+        throw std::runtime_error("failed to create vertex buffer!");
+    }
+
+    VkMemoryRequirements memRequirements;
+    vkGetBufferMemoryRequirements(data.device, data.vertexBuffer, &memRequirements);
+
+    VkMemoryAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    allocInfo.allocationSize = memRequirements.size;
+    allocInfo.memoryTypeIndex = findMemoryType(data, memRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+
+    if (vkAllocateMemory(data.device, &allocInfo, nullptr, &data.vertexBufferMemory) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to allocate vertex buffer memory!");
+    }
+
+    vkBindBufferMemory(data.device, data.vertexBuffer, data.vertexBufferMemory, 0);
+
+    void* localdata;
+    vkMapMemory(data.device, data.vertexBufferMemory, 0, bufferInfo.size, 0, &localdata);
+    memcpy(localdata, vertices.data(), (size_t)bufferInfo.size);
+    vkUnmapMemory(data.device, data.vertexBufferMemory);
+
+}
+
+uint32_t findMemoryType(RenderData& data, uint32_t typeFilter, VkMemoryPropertyFlags properties)
+{
+    VkPhysicalDeviceMemoryProperties memProperties;
+    vkGetPhysicalDeviceMemoryProperties(data.physicalDevice, &memProperties);
+
+    for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++)
+    {
+        if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) 
+        {
+            return i;
+        }
+    }
+
+    throw std::runtime_error("failed to find suitable memory type!");
 }
 /**
  * @brief Performs the Vulkan rendering process for a single frame.
