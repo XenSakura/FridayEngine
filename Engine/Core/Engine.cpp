@@ -15,8 +15,8 @@ Engine::Engine()
     : prevTime(std::chrono::steady_clock::now()),
     renderInstance(nullptr)
 {
-    GLFWSetup();
-    renderInstance = std::make_unique<RenderSystem>(*window);
+    renderInstance = std::make_unique<RenderSystem>();
+    window = &renderInstance.get()->GetWindow();
 }
 
 /**
@@ -31,7 +31,7 @@ void Engine::Run()
         auto currentTime = std::chrono::steady_clock::now();
         std::chrono::duration<float> deltaTime = currentTime - prevTime;
         float dt = deltaTime.count();
-
+        renderInstance->render();
         prevTime = currentTime;
     }
 }
@@ -41,29 +41,5 @@ void Engine::Run()
  */
 Engine::~Engine()
 {
-
-    GLFWCleanup();
     
-}
-/**
- * @brief GLFW setup commands.
- * 
- */
-void Engine::GLFWSetup()
-{
-    glfwInit();
-    
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-
-    window = glfwCreateWindow(WIDTH, HEIGHT, "FridayEngine", nullptr, nullptr);
-}
-/**
- * @brief GLFW cleanup.
- * 
- */
-void Engine::GLFWCleanup()
-{
-    glfwDestroyWindow(window);
-    glfwTerminate();
 }

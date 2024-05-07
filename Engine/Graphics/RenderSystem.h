@@ -14,25 +14,32 @@ typedef std::function<void(RenderData&)> RenderAPIExit;
 class RenderSystem
 {
 public:
-    RenderSystem(GLFWwindow& instance)
+    RenderSystem()
     {
-        data.window = &instance;
+        GLFWSetup();
         SetupFunction(data);
     }
     ~RenderSystem()
     {
         CleanupFunction(data);
+        GLFWCleanup();
     }
     void render()
     {
         std::lock_guard<std::mutex> lock(dataMutex);
         RenderFunction(data);
     }
+    
+    void GLFWSetup();
+    void GLFWCleanup();
+
+    GLFWwindow& GetWindow() const { return *data.window; }
 private:
     RenderData data;
     std::mutex dataMutex;
     RenderAPIInit SetupFunction = VulkanSetup;
-    RenderAPIRender RenderFunction;
+    RenderAPIRender RenderFunction = VulkanRender;
     RenderAPIExit CleanupFunction = VulkanCleanup;
-   
+    const uint32_t HEIGHT = 600;
+    const uint32_t WIDTH = 800;
 };

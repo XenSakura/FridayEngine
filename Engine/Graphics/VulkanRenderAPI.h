@@ -31,6 +31,28 @@ struct RenderData
     std::vector<VkImageView> swapChainImageViews;
 
     VkSurfaceKHR surface;
+    
+    VkRenderPass renderPass;
+
+    VkPipeline graphicsPipeline;
+
+    VkPipelineLayout pipelineLayout;
+
+    std::vector<VkFramebuffer> swapChainFramebuffers;
+
+    VkCommandPool commandPool;
+
+    std::vector<VkCommandBuffer> commandBuffers;
+
+    std::vector<VkSemaphore> imageAvailableSemaphores;
+
+    std::vector<VkSemaphore> renderFinishedSemaphores;
+
+    std::vector<VkFence> inFlightFences;
+
+    uint32_t currentFrame = 0;
+
+    bool frameBufferResized = false;
 };
 
 void VulkanSetup(RenderData& data);

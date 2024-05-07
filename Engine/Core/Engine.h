@@ -24,26 +24,11 @@ public:
     ~Engine();
 
 private:
-
+    //for deltatime calcs
     std::chrono::steady_clock::time_point prevTime;
-
-
+    //rendering system
     std::unique_ptr<RenderSystem> renderInstance;
-
-
+    //FOR GLFW SHOULD WINDOW CLOSE AAAA
     GLFWwindow* window;
-
-
-    const uint32_t HEIGHT = 600;
-
-
-    const uint32_t WIDTH = 800;
-
-
-    void GLFWSetup();
-
-
-    void GLFWCleanup();
-    
 };
 
