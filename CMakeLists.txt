@@ -50,3 +50,15 @@ endforeach()
 
 # Link libraries
 target_link_libraries(FridayEngine glm glfw imgui ${Vulkan_LIBRARIES})
+
+
+# Allow debugging
+target_compile_options(${PROJECT_NAME} PUBLIC -ggdb)
+
+# Copy assets
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_SOURCE_DIR}/shaders
+    $<TARGET_FILE_DIR:FridayEngine>/shaders
+    COMMENT "Copy shaders to build tree"
+)
