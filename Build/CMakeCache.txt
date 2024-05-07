@@ -27,4 +27,12 @@ CMAKE_CACHE_MAJOR_VERSION:INTERNAL=3
 CMAKE_CACHE_MINOR_VERSION:INTERNAL=29
 //Patch version of cmake used to create the current loaded cache
 CMAKE_CACHE_PATCH_VERSION:INTERNAL=1
+//Path to CMake executable.
+CMAKE_COMMAND:INTERNAL=C:/Program Files/CMake/bin/cmake.exe
+//Path to cpack program executable.
+CMAKE_CPACK_COMMAND:INTERNAL=C:/Program Files/CMake/bin/cpack.exe
+//Path to ctest program executable.
+CMAKE_CTEST_COMMAND:INTERNAL=C:/Program Files/CMake/bin/ctest.exe
+//Path to CMake installation.
+CMAKE_ROOT:INTERNAL=C:/Program Files/CMake/share/cmake-3.29
 
