@@ -53,6 +53,10 @@ struct RenderData
     uint32_t currentFrame = 0;
 
     bool frameBufferResized = false;
+
+    VkBuffer vertexBuffer;
+
+    VkDeviceMemory vertexBufferMemory;
 };
 
 void VulkanSetup(RenderData& data);
