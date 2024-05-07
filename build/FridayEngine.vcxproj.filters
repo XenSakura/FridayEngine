@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="D:\Digipen-Materials\techdemos\FridayEngine\Engine\Core\Engine.cpp">
+      <Filter>Engine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Digipen-Materials\techdemos\FridayEngine\Engine\Core\FridayEngine.cpp">
+      <Filter>Engine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Digipen-Materials\techdemos\FridayEngine\Engine\Graphics\RenderSystem.cpp">
+      <Filter>Engine\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Digipen-Materials\techdemos\FridayEngine\Engine\Graphics\VulkanRenderAPI.cpp">
+      <Filter>Engine\Graphics</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\Digipen-Materials\techdemos\FridayEngine\Engine\Core\Engine.h">
+      <Filter>Engine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Digipen-Materials\techdemos\FridayEngine\Engine\Core\FridayEngine.h">
+      <Filter>Engine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Digipen-Materials\techdemos\FridayEngine\Engine\Core\Resource.h">
+      <Filter>Engine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Digipen-Materials\techdemos\FridayEngine\Engine\Core\framework.h">
+      <Filter>Engine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Digipen-Materials\techdemos\FridayEngine\Engine\Core\targetver.h">
+      <Filter>Engine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Digipen-Materials\techdemos\FridayEngine\Engine\Graphics\RenderSystem.h">
+      <Filter>Engine\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Digipen-Materials\techdemos\FridayEngine\Engine\Graphics\VulkanRenderAPI.h">
+      <Filter>Engine\Graphics</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\Digipen-Materials\techdemos\FridayEngine\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Engine">
+      <UniqueIdentifier>{BA0664FC-69E9-3E4D-A3C3-D5B002770C65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Core">
+      <UniqueIdentifier>{BC0A6DA1-4AB6-3260-A59E-AD69F9FCFD7A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Graphics">
+      <UniqueIdentifier>{117C3286-EECE-3F48-A45F-C3FF7D6251C4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

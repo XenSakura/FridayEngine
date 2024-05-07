@@ -1159,7 +1159,14 @@ void RecreateSwapChain(RenderData& data)
     CreateImageViews(data);
     CreateFrameBuffers(data);
 }
-
+/**
+ * @brief Cleans up resources associated with the swap chain.
+ *
+ * This function destroys framebuffers and image views associated with the swap chain,
+ * as well as the swap chain itself.
+ *
+ * @param data The RenderData structure containing the Vulkan device and swap chain resources.
+ */
 void CleanupSwapChain(RenderData& data)
 {
     for ( auto framebuffer : data.swapChainFramebuffers) {
