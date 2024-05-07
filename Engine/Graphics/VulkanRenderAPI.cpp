@@ -8,6 +8,9 @@
 #include <glm/glm.hpp>
 #include <array>
 
+#include <cstring>
+#include <limits>
+
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
 struct QueueFamilyIndices
@@ -365,7 +368,7 @@ bool CheckValidationLayerSupport()
         }
 
         // If any required layer is not found, return false
-        if (!layerFound)
+         if (!layerFound)
         {
             return false;
         }

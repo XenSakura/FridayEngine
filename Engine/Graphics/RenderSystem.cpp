@@ -1,4 +1,3 @@
-#pragma once
 #include "RenderSystem.h"
 /**
  * @brief GLFW setup commands.
