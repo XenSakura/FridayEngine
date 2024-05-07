@@ -1,3 +1,0 @@
-D:/Digipen-Materials/techdemos/FridayEngine/build/CMakeFiles/FridayEngine.dir
-D:/Digipen-Materials/techdemos/FridayEngine/build/CMakeFiles/ALL_BUILD.dir
-D:/Digipen-Materials/techdemos/FridayEngine/build/CMakeFiles/ZERO_CHECK.dir
