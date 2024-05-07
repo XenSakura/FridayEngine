@@ -1,30 +1,52 @@
-cmake_minimum_required(VERSION 3.10)
-
-project(FridayEngine)
+cmake_minimum_required(VERSION 3.20)
+project(FridayEngine VERSION 1.0)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
 
-include_directories(${PROJECT_SOURCE_DIR}/include)
+# Add Vulkan
+find_package(Vulkan REQUIRED)
 
-# Add your source files here
-set(SOURCES 
-    main.cpp
-    # Add more source files if needed
+# Add glm
+add_subdirectory(Libraries/glm)
+
+# Include directories
+include_directories(
+    ${CMAKE_SOURCE_DIR}/Libraries/glm
+    ${Vulkan_INCLUDE_DIR}
+    ${CMAKE_SOURCE_DIR}/Engine/Core
+    ${CMAKE_SOURCE_DIR}/Engine/Graphics
+    ${CMAKE_SOURCE_DIR}/Engine/Physics
 )
 
-# Add your library files here
-set(LIBRARIES
-    ${PROJECT_SOURCE_DIR}/lib/tinyrací.a
-    # Add more libraries if needed
+# List source files
+file(GLOB_RECURSE ENGINE_CORE_SOURCES
+    "Engine/Core/*.cpp"
+    "Engine/Core/*.h"
+)
+file(GLOB_RECURSE ENGINE_GRAPHICS_SOURCES
+    "Engine/Graphics/*.cpp"
+    "Engine/Graphics/*.h"
+)
+file(GLOB_RECURSE ENGINE_PHYSICS_SOURCES
+    "Engine/Physics/*.cpp"
+    "Engine/Physics/*.h"
 )
 
-# Create the executable
-add_executable(FridayEngine ${SOURCES})
+# Add executable
+add_executable(FridayEngine 
+    ${ENGINE_CORE_SOURCES}
+    ${ENGINE_GRAPHICS_SOURCES}
+    ${ENGINE_PHYSICS_SOURCES}
+)
 
-# Link the libraries to the executable
-target_link_libraries(FridayEngine ${LIBRARIES})
+# Group source files by subdirectories under "Engine"
+foreach(_source IN ITEMS ${ENGINE_CORE_SOURCES} ${ENGINE_GRAPHICS_SOURCES} ${ENGINE_PHYSICS_SOURCES})
+    get_filename_component(_source_path "${_source}" PATH)
+    file(RELATIVE_PATH _source_path_rel "${CMAKE_SOURCE_DIR}/Engine" "${_source_path}")
+    string(REPLACE "/" "\\" _group_path "${_source_path_rel}")
+    source_group("Engine\\${_group_path}" FILES "${_source}")
+endforeach()
 
-# Install the executable
-install(TARGETS FridayEngine DESTINATION bin)
+# Link libraries
+target_link_libraries(FridayEngine glm glfw imgui ${Vulkan_LIBRARIES})
