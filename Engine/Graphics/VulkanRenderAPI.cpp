@@ -5,6 +5,7 @@
 #include <set> //set data structure
 #include <optional>
 #include <fstream>
+#include <glm/glm.hpp>
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
