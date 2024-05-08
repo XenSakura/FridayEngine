@@ -59,9 +59,14 @@ struct Vertex
 };
 
 const std::vector<Vertex> vertices = {
-    {{0.0f, -0.5f}, {1.0f, 1.0f, 1.0f}},
-    {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
-    {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
+    {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+    {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+    {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+    {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
+};
+
+const std::vector<uint16_t> indices = {
+    0, 1, 2, 2, 3, 0
 };
 //Function declarations
 VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData);
@@ -97,6 +102,7 @@ void CreateVertexBuffer(RenderData& data);
 void CreateBuffer(RenderData& data, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 void CopyBuffer(RenderData& data, VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 uint32_t findMemoryType(RenderData& data, uint32_t typeFilter, VkMemoryPropertyFlags properties);
+void CreateIndexBuffer(RenderData& data);
 
 const std::vector<const char*> validationLayers = { "VK_LAYER_KHRONOS_validation" };
 const std::vector<const char*> deviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
@@ -164,6 +170,7 @@ void VulkanSetup(RenderData& data)
     CreateFrameBuffers(data);
     CreateCommandPool(data);
     CreateVertexBuffer(data);
+    CreateIndexBuffer(data);
     CreateCommandBuffers(data);
     CreateSyncObjects(data);
 }
@@ -177,6 +184,9 @@ void VulkanCleanup(RenderData& data)
 {
     vkDeviceWaitIdle(data.device);
     CleanupSwapChain(data);
+
+    vkDestroyBuffer(data.device, data.indexBuffer, nullptr);
+    vkFreeMemory(data.device, data.indexBufferMemory, nullptr);
 
     vkDestroyBuffer(data.device, data.vertexBuffer, nullptr);
     vkFreeMemory(data.device, data.vertexBufferMemory, nullptr);
@@ -1117,8 +1127,8 @@ void RecordCommandBuffer(RenderData& data, VkCommandBuffer commandBuffer, uint32
         VkBuffer vertexBuffers[] = { data.vertexBuffer };
         VkDeviceSize offsets[] = { 0 };
         vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
-
-        vkCmdDraw(commandBuffer, static_cast<uint32_t>(vertices.size()), 1, 0, 0);
+        vkCmdBindIndexBuffer(commandBuffer, data.indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+        vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
    
     // End render pass
     vkCmdEndRenderPass(commandBuffer);
@@ -1276,6 +1286,26 @@ void CreateVertexBuffer(RenderData& data)
     CreateBuffer(data, bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, data.vertexBuffer, data.vertexBufferMemory);
 
     CopyBuffer(data, stagingBuffer, data.vertexBuffer, bufferSize);
+
+    vkDestroyBuffer(data.device, stagingBuffer, nullptr);
+    vkFreeMemory(data.device, stagingBufferMemory, nullptr);
+}
+void CreateIndexBuffer(RenderData& data)
+{
+    VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
+
+    VkBuffer stagingBuffer;
+    VkDeviceMemory stagingBufferMemory;
+    CreateBuffer(data, bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+
+    void* localdata;
+    vkMapMemory(data.device, stagingBufferMemory, 0, bufferSize, 0, &localdata);
+    memcpy(localdata, indices.data(), (size_t)bufferSize);
+    vkUnmapMemory(data.device, stagingBufferMemory);
+
+    CreateBuffer(data, bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, data.indexBuffer, data.indexBufferMemory);
+
+    CopyBuffer(data, stagingBuffer, data.indexBuffer, bufferSize);
 
     vkDestroyBuffer(data.device, stagingBuffer, nullptr);
     vkFreeMemory(data.device, stagingBufferMemory, nullptr);
