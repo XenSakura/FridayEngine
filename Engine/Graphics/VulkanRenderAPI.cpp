@@ -7,6 +7,8 @@
 #include <fstream>
 #include <glm/glm.hpp>
 #include <array>
+#include <cstring>
+#include <limits>
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
@@ -67,6 +69,36 @@ const std::vector<Vertex> vertices = {
 
 const std::vector<uint16_t> indices = {
     0, 1, 2, 2, 3, 0
+
+    static VkVertexInputBindingDescription getBindingDescription()
+    {
+        VkVertexInputBindingDescription bindingDescription{};
+        bindingDescription.binding = 0;
+        bindingDescription.stride = sizeof(Vertex);
+        bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+        return bindingDescription;
+    }
+    static std::array<VkVertexInputAttributeDescription, 2> getAttributeDescriptions() 
+    {
+        std::array<VkVertexInputAttributeDescription, 2> attributeDescriptions{};
+
+        attributeDescriptions[0].binding = 0;
+        attributeDescriptions[0].location = 0;
+        attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
+        attributeDescriptions[0].offset = offsetof(Vertex, pos);
+
+        attributeDescriptions[1].binding = 0;
+        attributeDescriptions[1].location = 1;
+        attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
+        attributeDescriptions[1].offset = offsetof(Vertex, color);
+        return attributeDescriptions;
+    }
+};
+
+const std::vector<Vertex> vertices = {
+    {{0.0f, -0.5f}, {1.0f, 1.0f, 1.0f}},
+    {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
+    {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
 };
 //Function declarations
 VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData);
@@ -103,6 +135,7 @@ void CreateBuffer(RenderData& data, VkDeviceSize size, VkBufferUsageFlags usage,
 void CopyBuffer(RenderData& data, VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 uint32_t findMemoryType(RenderData& data, uint32_t typeFilter, VkMemoryPropertyFlags properties);
 void CreateIndexBuffer(RenderData& data);
+
 
 const std::vector<const char*> validationLayers = { "VK_LAYER_KHRONOS_validation" };
 const std::vector<const char*> deviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
@@ -171,6 +204,7 @@ void VulkanSetup(RenderData& data)
     CreateCommandPool(data);
     CreateVertexBuffer(data);
     CreateIndexBuffer(data);
+
     CreateCommandBuffers(data);
     CreateSyncObjects(data);
 }
@@ -187,7 +221,7 @@ void VulkanCleanup(RenderData& data)
 
     vkDestroyBuffer(data.device, data.indexBuffer, nullptr);
     vkFreeMemory(data.device, data.indexBufferMemory, nullptr);
-
+  
     vkDestroyBuffer(data.device, data.vertexBuffer, nullptr);
     vkFreeMemory(data.device, data.vertexBufferMemory, nullptr);
 
@@ -377,7 +411,7 @@ bool CheckValidationLayerSupport()
         }
 
         // If any required layer is not found, return false
-        if (!layerFound)
+         if (!layerFound)
         {
             return false;
         }
@@ -1127,8 +1161,10 @@ void RecordCommandBuffer(RenderData& data, VkCommandBuffer commandBuffer, uint32
         VkBuffer vertexBuffers[] = { data.vertexBuffer };
         VkDeviceSize offsets[] = { 0 };
         vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+  
         vkCmdBindIndexBuffer(commandBuffer, data.indexBuffer, 0, VK_INDEX_TYPE_UINT16);
         vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+
    
     // End render pass
     vkCmdEndRenderPass(commandBuffer);
@@ -1242,6 +1278,7 @@ void CleanupSwapChain(RenderData& data)
 
     vkDestroySwapchainKHR(data.device, data.swapChain, nullptr);
 }
+
 void CreateBuffer(RenderData& data, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory)
 {
     VkBufferCreateInfo bufferInfo{};
@@ -1257,6 +1294,7 @@ void CreateBuffer(RenderData& data, VkDeviceSize size, VkBufferUsageFlags usage,
 
     VkMemoryRequirements memRequirements;
     vkGetBufferMemoryRequirements(data.device, buffer, &memRequirements);
+
 
     VkMemoryAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
