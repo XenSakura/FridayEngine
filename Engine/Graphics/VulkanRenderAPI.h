@@ -57,6 +57,11 @@ struct RenderData
     VkBuffer vertexBuffer;
 
     VkDeviceMemory vertexBufferMemory;
+
+    VkBuffer indexBuffer;
+
+    VkDeviceMemory indexBufferMemory;
+
 };
 
 void VulkanSetup(RenderData& data);
