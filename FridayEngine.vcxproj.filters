@@ -42,6 +42,18 @@
     <ClInclude Include="Engine\Graphics\VulkanRenderAPI.h">
       <Filter>Engine\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\System.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\EntityManager.h">
+      <Filter>Engine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\JobSystem.h">
+      <Filter>Engine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\MemoryManager.h">
+      <Filter>Engine\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="FridayEngine.rc">
@@ -68,6 +80,18 @@
     </ClCompile>
     <ClCompile Include="Engine\Graphics\VulkanRenderAPI.cpp">
       <Filter>Engine\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\System.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\EntityManager.cpp">
+      <Filter>Engine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\JobSystem.cpp">
+      <Filter>Engine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\MemoryManager.cpp">
+      <Filter>Engine\Core</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
