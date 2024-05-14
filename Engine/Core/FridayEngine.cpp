@@ -4,7 +4,8 @@
 #include "Engine.h"
 #include <iostream>
 
-int main() {
+int main() 
+{
     Engine instance;
     try
     {

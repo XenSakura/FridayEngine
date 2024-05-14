@@ -28,6 +28,9 @@
     <Filter Include="Engine\Core">
       <UniqueIdentifier>{ba5c26ae-b17c-45b2-98ac-40d5c9d679b6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\Custom Data Structures">
+      <UniqueIdentifier>{2a4937f9-1642-4991-8a7f-2e27824696c4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Core\FridayEngine.h">
@@ -51,7 +54,10 @@
     <ClInclude Include="Engine\Core\JobSystem.h">
       <Filter>Engine\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Core\MemoryManager.h">
+    <ClInclude Include="Engine\Core\Allocator.h">
+      <Filter>Engine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Event.h">
       <Filter>Engine\Core</Filter>
     </ClInclude>
   </ItemGroup>
@@ -90,7 +96,7 @@
     <ClCompile Include="Engine\Core\JobSystem.cpp">
       <Filter>Engine\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Core\MemoryManager.cpp">
+    <ClCompile Include="Engine\Core\Allocator.cpp">
       <Filter>Engine\Core</Filter>
     </ClCompile>
   </ItemGroup>
