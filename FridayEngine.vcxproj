@@ -144,6 +144,7 @@
     <ClInclude Include="Engine\Graphics\RenderSystem.h" />
     <ClInclude Include="Engine\Graphics\VulkanRenderAPI.h" />
     <ClInclude Include="Engine\System.h" />
+    <ClInclude Include="engine\UnitTests.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="FridayEngine.rc" />
@@ -161,6 +162,7 @@
     <ClCompile Include="Engine\Graphics\RenderSystem.cpp" />
     <ClCompile Include="Engine\Graphics\VulkanRenderAPI.cpp" />
     <ClCompile Include="Engine\System.cpp" />
+    <ClCompile Include="engine\UnitTests.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

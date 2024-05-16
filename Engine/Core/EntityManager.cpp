@@ -23,7 +23,7 @@ void EntityManager::Serialize()
 {
 
 }
-EntityManager::EntityManager()
+EntityManager::~EntityManager()
 {
 	for (const auto& system : Systems)
 	{

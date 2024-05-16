@@ -1,10 +1,7 @@
 #pragma once
 #include "VulkanRenderAPI.h"
-
-
 #include <functional>
-#include "..\System.h"
-System Render = {};
+#include <iostream>
 
 //change to include vector of objects to render
 typedef std::function<void(RenderData&)> RenderAPIInit;

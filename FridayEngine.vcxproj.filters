@@ -60,6 +60,9 @@
     <ClInclude Include="Engine\Core\Event.h">
       <Filter>Engine\Core</Filter>
     </ClInclude>
+    <ClInclude Include="engine\UnitTests.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="FridayEngine.rc">
@@ -98,6 +101,9 @@
     </ClCompile>
     <ClCompile Include="Engine\Core\Allocator.cpp">
       <Filter>Engine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\UnitTests.cpp">
+      <Filter>Engine</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
