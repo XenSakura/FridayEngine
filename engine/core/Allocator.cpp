@@ -2,10 +2,15 @@
 #include <stdexcept>
 
 MemoryAllocator::MemoryAllocator()
-    :blockSize(DEFAULT_BLOCK_SIZE), pageSize(DEFAULT_PAGE_SIZE), totalPages(DEFAULT_NUM_PAGES),
-    Allocations(0), Deallocations(0), PagesInUse(0), FreeObjects(0),
-    currentPages(0)
 {
+    allocatorStats.blockSize = DEFAULT_BLOCK_SIZE; 
+    allocatorStats.pageSize = DEFAULT_PAGE_SIZE;  
+    allocatorStats.totalPages = DEFAULT_NUM_PAGES;
+    allocatorStats.Allocations = 0;
+    allocatorStats.Deallocations = 0;
+    allocatorStats.PagesInUse = 0; 
+    allocatorStats.FreeObjects = 0,
+    allocatorStats.currentPages = 0;
     // Initialize memory pages
     for (int i = 0; i < DEFAULT_NUM_PAGES; ++i)
     {
@@ -14,11 +19,15 @@ MemoryAllocator::MemoryAllocator()
 }
 
 MemoryAllocator::MemoryAllocator(size_t Pages, size_t PageSize, size_t BlockSize)
-    :blockSize(BlockSize), pageSize(PageSize), totalPages(Pages),
-    Allocations(0), Deallocations(0), PagesInUse(0), FreeObjects(0),
-    currentPages(0)
 {
-
+    allocatorStats.blockSize = BlockSize;
+    allocatorStats.pageSize = PageSize;
+    allocatorStats.totalPages = Pages;
+    allocatorStats.Allocations = 0;
+    allocatorStats.Deallocations = 0;
+    allocatorStats.PagesInUse = 0;
+    allocatorStats.FreeObjects = 0,
+    allocatorStats.currentPages = 0;
     // Initialize memory pages
     for (int i = 0; i < Pages; ++i)
     {
@@ -50,16 +59,16 @@ MemoryAllocator::~MemoryAllocator()
 }
 void MemoryAllocator::AllocateNewPage()
 {
-    if (currentPages >= totalPages)
+    if (allocatorStats.currentPages >= allocatorStats.totalPages)
     {
         throw std::runtime_error("Memory Allocator limit reached!");
         return;
     }
-    Page* page = new Page(pageSize, blockSize);
+    Page* page = new Page(allocatorStats.pageSize, allocatorStats.blockSize);
     FreeList.push_back(page);
-    FreeObjects += pageSize / blockSize;
-    currentPages += 1;
-
+    allocatorStats.FreeObjects += allocatorStats.pageSize / allocatorStats.blockSize;
+    allocatorStats.currentPages += 1;
+    allocatorStats.PageStats.push_back(page->metadata);
 }
 
 void* MemoryAllocator::allocate()
@@ -89,9 +98,9 @@ void* MemoryAllocator::allocate()
     {
         if (current->metadata[i].allocated == false)
         {
-            returnPtr = &current->Data[i * blockSize];
-            Allocations++;
-            FreeObjects--;
+            returnPtr = &current->Data[i * allocatorStats.blockSize];
+            allocatorStats.Allocations++;
+            allocatorStats.FreeObjects--;
             current->FreeObjects--;
             current->metadata[i].allocated = true;
             break;
@@ -127,17 +136,17 @@ void MemoryAllocator::deallocate(void* ptr)
         {
             Page* page = *it;
             // Check if the pointer belongs to this page
-            if (ptr >= page->Data && ptr < (page->Data + (page->numBlocks * blockSize)))
+            if (ptr >= page->Data && ptr < (page->Data + (page->numBlocks * allocatorStats.blockSize)))
             {
                 // Calculate the block index
-                int blockIndex = (static_cast<char*>(ptr) - page->Data) / blockSize;
+                int blockIndex = (static_cast<char*>(ptr) - page->Data) / allocatorStats.blockSize;
 
                 if (page->metadata[blockIndex].allocated)
                 {
                     page->metadata[blockIndex].allocated = false;
                     page->FreeObjects++;
-                    Deallocations++;
-                    FreeObjects++;
+                    allocatorStats.Deallocations++;
+                    allocatorStats.FreeObjects++;
 
                     // Move the page if necessary
                     if (pageList == full && page->FreeObjects > 0)
@@ -178,6 +187,10 @@ MemoryAllocator::Page::Page(size_t pageSize, size_t blockSize)
     FreeObjects = PageSize / BlockSize;
     metadata = new BlockInfo[numBlocks];
     Data = new char[PageSize];
+    for (unsigned i = 0; i < PageSize / BlockSize; i++)
+    {
+        metadata[i].address = &Data[i * BlockSize];
+    }
 }
 
 // Destructor for Page struct
@@ -185,4 +198,9 @@ MemoryAllocator::Page::~Page()
 {
     delete[] metadata;
     delete[] Data;
+}
+
+const MemoryAllocator::Stats* MemoryAllocator::GetStats() const
+{
+    return &allocatorStats;
 }
