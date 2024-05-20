@@ -49,12 +49,15 @@ MemoryAllocator CreateAllocator(size_t pages = 3, size_t pageSize = 256, size_t 
     return MemoryAllocator(pages, pageSize, blockSize);
 }
 
-void TestAllocationAndDeallocation() {
-    try {
+void TestAllocationAndDeallocation() 
+{
+    try 
+    {
         MemoryAllocator allocator = CreateAllocator();
         PrintAllocatorStats(allocator);
         float* floattest = static_cast<float*>(allocator.allocate());
-        if (floattest == nullptr) {
+        if (floattest == nullptr) 
+        {
             throw std::runtime_error("Allocation failed");
         }
         PrintAllocatorStats(allocator);
@@ -62,13 +65,16 @@ void TestAllocationAndDeallocation() {
         PrintAllocatorStats(allocator);
         std::cout << "TestAllocationAndDeallocation passed\n";
     }
-    catch (const std::runtime_error& e) {
+    catch (const std::runtime_error& e) 
+    {
         std::cerr << "TestAllocationAndDeallocation failed: " << e.what() << '\n';
     }
 }
 
-void TestAllocationUntilExhausted() {
-    try {
+void TestAllocationUntilExhausted() 
+{
+    try 
+    {
         size_t pages = 2;
         size_t pageSize = 128; // 2 pages * 128 bytes = 256 bytes total
         size_t blockSize = 64; // Each block is 64 bytes
@@ -80,29 +86,35 @@ void TestAllocationUntilExhausted() {
         for (int i = 0; i < 4; ++i) 
         {
             blocks[i] = allocator.allocate();
-            if (blocks[i] == nullptr) {
+            if (blocks[i] == nullptr) 
+            {
                 throw std::runtime_error("Allocation failed");
             }
             PrintAllocatorStats(allocator);
         }
 
         // Next allocation should fail
-        try {
+        try 
+        {
             allocator.allocate();
             PrintAllocatorStats(allocator);
             throw std::runtime_error("Allocation should have failed but did not");
         }
-        catch (const std::runtime_error&) {
+        catch (const std::runtime_error&) 
+        {
             std::cout << "TestAllocationUntilExhausted passed\n";
         }
     }
-    catch (const std::runtime_error& e) {
+    catch (const std::runtime_error& e) 
+    {
         std::cerr << "TestAllocationUntilExhausted failed: " << e.what() << '\n';
     }
 }
 
-void TestDeallocateAndReallocate() {
-    try {
+void TestDeallocateAndReallocate() 
+{
+    try 
+    {
         MemoryAllocator allocator = CreateAllocator();
         PrintAllocatorStats(allocator);
         void* block1 = allocator.allocate();
@@ -110,7 +122,8 @@ void TestDeallocateAndReallocate() {
         void* block2 = allocator.allocate();
         PrintAllocatorStats(allocator);
 
-        if (block1 == nullptr || block2 == nullptr) {
+        if (block1 == nullptr || block2 == nullptr) 
+        {
             throw std::runtime_error("Allocation failed");
         }
 
@@ -118,7 +131,8 @@ void TestDeallocateAndReallocate() {
         PrintAllocatorStats(allocator);
         void* block3 = allocator.allocate();
         PrintAllocatorStats(allocator);
-        if (block1 != block3) {
+        if (block1 != block3) 
+        {
             throw std::runtime_error("Reallocation did not reuse the deallocated block");
         }
 
@@ -129,56 +143,68 @@ void TestDeallocateAndReallocate() {
 
         std::cout << "TestDeallocateAndReallocate passed\n";
     }
-    catch (const std::runtime_error& e) {
+    catch (const std::runtime_error& e) 
+    {
         std::cerr << "TestDeallocateAndReallocate failed: " << e.what() << '\n';
     }
 }
 
-void TestDoubleFreeDetection() {
-    try {
+void TestDoubleFreeDetection() 
+{
+    try 
+    {
         MemoryAllocator allocator = CreateAllocator();
         PrintAllocatorStats(allocator);
         void* block1 = allocator.allocate();
         PrintAllocatorStats(allocator);
 
-        if (block1 == nullptr) {
+        if (block1 == nullptr) 
+        {
             throw std::runtime_error("Allocation failed");
         }
 
         allocator.deallocate(block1);
         PrintAllocatorStats(allocator);
         // Double free should throw an exception
-        try {
+        try 
+        {
             allocator.deallocate(block1);
             throw std::runtime_error("Double free should have failed but did not");
             PrintAllocatorStats(allocator);
         }
-        catch (const std::runtime_error&) {
+        catch (const std::runtime_error&) 
+        {
             std::cout << "TestDoubleFreeDetection passed\n";
         }
     }
-    catch (const std::runtime_error& e) {
+    catch (const std::runtime_error& e) 
+    {
         std::cerr << "TestDoubleFreeDetection failed: " << e.what() << '\n';
     }
 }
 
-void TestInvalidPointerDeallocation() {
-    try {
+void TestInvalidPointerDeallocation() 
+{
+    try 
+    {
         MemoryAllocator allocator = CreateAllocator();
         PrintAllocatorStats(allocator);
         float invalidBlock;
 
         // Deallocating an invalid pointer should throw an exception
-        try {
+        try 
+        {
             allocator.deallocate(&invalidBlock);
             throw std::runtime_error("Invalid pointer deallocation should have failed but did not");
             PrintAllocatorStats(allocator);
         }
-        catch (const std::runtime_error&) {
+        catch (const std::runtime_error&) 
+        {
             std::cout << "TestInvalidPointerDeallocation passed\n";
         }
     }
-    catch (const std::runtime_error& e) {
+    catch (const std::runtime_error& e) 
+    {
         std::cerr << "TestInvalidPointerDeallocation failed: " << e.what() << '\n';
     }
 }
