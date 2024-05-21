@@ -8,7 +8,7 @@ class Publisher
 
 	}
 	
-	std::queue<>
+	std::queue<PayloadType> payload;
 };
 
 class EventHandler

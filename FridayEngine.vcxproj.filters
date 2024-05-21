@@ -31,6 +31,9 @@
     <Filter Include="Engine\Custom Data Structures">
       <UniqueIdentifier>{2a4937f9-1642-4991-8a7f-2e27824696c4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\Core\Event">
+      <UniqueIdentifier>{7ea5acd7-5158-49df-8f44-c74d05661034}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Core\FridayEngine.h">
@@ -57,11 +60,11 @@
     <ClInclude Include="Engine\Core\Allocator.h">
       <Filter>Engine\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Core\Event.h">
-      <Filter>Engine\Core</Filter>
-    </ClInclude>
     <ClInclude Include="engine\UnitTests.h">
       <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Event.h">
+      <Filter>Engine\Core\Event</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -104,6 +107,9 @@
     </ClCompile>
     <ClCompile Include="engine\UnitTests.cpp">
       <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\core\Event.cpp">
+      <Filter>Engine\Core\Event</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

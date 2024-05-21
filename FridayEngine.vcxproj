@@ -156,6 +156,7 @@
   <ItemGroup>
     <ClCompile Include="Engine\Core\Engine.cpp" />
     <ClCompile Include="Engine\Core\EntityManager.cpp" />
+    <ClCompile Include="engine\core\Event.cpp" />
     <ClCompile Include="Engine\Core\FridayEngine.cpp" />
     <ClCompile Include="Engine\Core\JobSystem.cpp" />
     <ClCompile Include="Engine\Core\Allocator.cpp" />
