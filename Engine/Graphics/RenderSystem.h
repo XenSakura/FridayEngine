@@ -1,10 +1,7 @@
 #pragma once
 #include "VulkanRenderAPI.h"
-
-#include <thread>
-#include <mutex>
 #include <functional>
-
+#include <iostream>
 
 //change to include vector of objects to render
 typedef std::function<void(RenderData&)> RenderAPIInit;
@@ -26,7 +23,6 @@ public:
     }
     void render()
     {
-        std::lock_guard<std::mutex> lock(dataMutex);
         RenderFunction(data);
     }
     
@@ -36,7 +32,6 @@ public:
     GLFWwindow& GetWindow() const { return *data.window; }
 private:
     RenderData data;
-    std::mutex dataMutex;
     RenderAPIInit SetupFunction = VulkanSetup;
     RenderAPIRender RenderFunction = VulkanRender;
     RenderAPIExit CleanupFunction = VulkanCleanup;

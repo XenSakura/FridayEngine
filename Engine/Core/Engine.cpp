@@ -6,7 +6,8 @@
  * @date   April 2024
  *********************************************************************/
 #include "Engine.h"
-
+#include "..\UnitTests.h"
+#include <iostream>
 /**
  * @brief Engine Constructor.
  * 
@@ -17,6 +18,9 @@ Engine::Engine()
 {
     renderInstance = std::make_unique<RenderSystem>();
     window = &renderInstance.get()->GetWindow();
+#ifdef _DEBUG
+    RunUnitTests();
+#endif
 }
 
 /**

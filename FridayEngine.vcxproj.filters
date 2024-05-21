@@ -28,6 +28,12 @@
     <Filter Include="Engine\Core">
       <UniqueIdentifier>{ba5c26ae-b17c-45b2-98ac-40d5c9d679b6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\Custom Data Structures">
+      <UniqueIdentifier>{2a4937f9-1642-4991-8a7f-2e27824696c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Core\Event">
+      <UniqueIdentifier>{7ea5acd7-5158-49df-8f44-c74d05661034}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Core\FridayEngine.h">
@@ -41,6 +47,24 @@
     </ClInclude>
     <ClInclude Include="Engine\Graphics\VulkanRenderAPI.h">
       <Filter>Engine\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\System.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\EntityManager.h">
+      <Filter>Engine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\JobSystem.h">
+      <Filter>Engine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Allocator.h">
+      <Filter>Engine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\UnitTests.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Event.h">
+      <Filter>Engine\Core\Event</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -68,6 +92,24 @@
     </ClCompile>
     <ClCompile Include="Engine\Graphics\VulkanRenderAPI.cpp">
       <Filter>Engine\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\System.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\EntityManager.cpp">
+      <Filter>Engine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\JobSystem.cpp">
+      <Filter>Engine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Allocator.cpp">
+      <Filter>Engine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\UnitTests.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\core\Event.cpp">
+      <Filter>Engine\Core\Event</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

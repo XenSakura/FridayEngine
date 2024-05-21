@@ -104,7 +104,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Libraries\glm;$(SolutionDir)Libraries\glfw-3.4\include;$(SolutionDir)Engine\Core;$(SolutionDir)Engine\Graphics;$(SolutionDir)Engine\Physics;C:\VulkanSDK\1.3.280.0\Include;$(SolutionDir)Libraries\imgui-master;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)libraries\glm;$(SolutionDir)libraries\glfw-3.4\include;$(SolutionDir)engine\core;$(SolutionDir)engine\graphics;$(SolutionDir)engine\physics;C:\VulkanSDK\1.3.280.0\Include;$(SolutionDir)libraries\imgui-master;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -136,9 +136,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Core\Engine.h" />
+    <ClInclude Include="Engine\Core\EntityManager.h" />
+    <ClInclude Include="Engine\Core\Event.h" />
     <ClInclude Include="Engine\Core\FridayEngine.h" />
+    <ClInclude Include="Engine\Core\JobSystem.h" />
+    <ClInclude Include="Engine\Core\Allocator.h" />
     <ClInclude Include="Engine\Graphics\RenderSystem.h" />
     <ClInclude Include="Engine\Graphics\VulkanRenderAPI.h" />
+    <ClInclude Include="Engine\System.h" />
+    <ClInclude Include="engine\UnitTests.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="FridayEngine.rc" />
@@ -149,9 +155,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\Core\Engine.cpp" />
+    <ClCompile Include="Engine\Core\EntityManager.cpp" />
+    <ClCompile Include="engine\core\Event.cpp" />
     <ClCompile Include="Engine\Core\FridayEngine.cpp" />
+    <ClCompile Include="Engine\Core\JobSystem.cpp" />
+    <ClCompile Include="Engine\Core\Allocator.cpp" />
     <ClCompile Include="Engine\Graphics\RenderSystem.cpp" />
     <ClCompile Include="Engine\Graphics\VulkanRenderAPI.cpp" />
+    <ClCompile Include="Engine\System.cpp" />
+    <ClCompile Include="engine\UnitTests.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
