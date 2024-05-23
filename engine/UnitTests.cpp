@@ -45,7 +45,8 @@ void PrintAllocatorStats(MemoryAllocator& allocator)
         page++;
     }
 }
-MemoryAllocator CreateAllocator(size_t pages = 3, size_t pageSize = 256, size_t blockSize = 64) {
+MemoryAllocator CreateAllocator(size_t pages = 3, size_t pageSize = 256, size_t blockSize = 64) 
+{
     return MemoryAllocator(pages, pageSize, blockSize);
 }
 

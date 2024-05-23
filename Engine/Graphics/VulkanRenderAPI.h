@@ -62,6 +62,17 @@ struct RenderData
 
     VkDeviceMemory indexBufferMemory;
 
+    VkBuffer stagingBuffer;
+
+    VkDeviceMemory stagingBufferMemory;
+
+    VkImage textureImage;
+
+    VkDeviceMemory textureImageMemory;
+
+    VkImageView textureImageView;
+
+    VkSampler textureSampler;
 };
 
 void VulkanSetup(RenderData& data);
