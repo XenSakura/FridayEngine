@@ -1705,11 +1705,13 @@ void CreateDescriptorSets(RenderData& data)
     allocInfo.pSetLayouts = layouts.data();
 
     data.descriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
-    if (vkAllocateDescriptorSets(data.device, &allocInfo, data.descriptorSets.data()) != VK_SUCCESS) {
+    if (vkAllocateDescriptorSets(data.device, &allocInfo, data.descriptorSets.data()) != VK_SUCCESS) 
+    {
         throw std::runtime_error("failed to allocate descriptor sets!");
     }
 
-    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) 
+    {
         VkDescriptorBufferInfo bufferInfo{};
         bufferInfo.buffer = data.uniformBuffers[i];
         bufferInfo.offset = 0;
