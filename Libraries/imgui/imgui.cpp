@@ -1,4 +1,4 @@
-// dear imgui, v1.90.5 WIP
+// dear imgui, v1.90.6 WIP
 // (main code and documentation)
 
 // Help:
@@ -10,7 +10,7 @@
 // - FAQ ........................ https://dearimgui.com/faq (in repository as docs/FAQ.md)
 // - Homepage ................... https://github.com/ocornut/imgui
 // - Releases & changelog ....... https://github.com/ocornut/imgui/releases
-// - Gallery .................... https://github.com/ocornut/imgui/issues/6897 (please post your screenshots/video there!)
+// - Gallery .................... https://github.com/ocornut/imgui/issues/7503 (please post your screenshots/video there!)
 // - Wiki ....................... https://github.com/ocornut/imgui/wiki (lots of good stuff there)
 //   - Getting Started            https://github.com/ocornut/imgui/wiki/Getting-Started (how to integrate in an existing app by adding ~25 lines of code)
 //   - Third-party Extensions     https://github.com/ocornut/imgui/wiki/Useful-Extensions (ImPlot & many more)
@@ -430,6 +430,12 @@ CODE
  When you are not sure about an old symbol or function name, try using the Search/Find function of your IDE to look for comments or references in all imgui files.
  You can read releases logs https://github.com/ocornut/imgui/releases for more details.
 
+ - 2024/04/18 (1.90.6) - treeNode: Fixed a layout inconsistency when using an empty/hidden label followed by a SameLine() call. (#7505, #282)
+                           - old: TreeNode("##Hidden"); SameLine(); Text("Hello");     // <-- This was actually incorrect! BUT appeared to look ok with the default style where ItemSpacing.x == FramePadding.x * 2 (it didn't look aligned otherwise).
+                           - new: TreeNode("##Hidden"); SameLine(0, 0); Text("Hello"); // <-- This is correct for all styles values.
+                         with the fix, IF you were successfully using TreeNode("")+SameLine(); you will now have extra spacing between your TreeNode and the following item.
+                         You'll need to change the SameLine() call to SameLine(0,0) to remove this extraneous spacing. This seemed like the more sensible fix that's not making things less consistent.
+                         (Note: when using this idiom you are likely to also use ImGuiTreeNodeFlags_SpanAvailWidth).
  - 2024/03/18 (1.90.5) - merged the radius_x/radius_y parameters in ImDrawList::AddEllipse(), AddEllipseFilled() and PathEllipticalArcTo() into a single ImVec2 parameter. Exceptionally, because those functions were added in 1.90, we are not adding inline redirection functions. The transition is easy and should affect few users. (#2743, #7417)
  - 2024/03/08 (1.90.5) - inputs: more formally obsoleted GetKeyIndex() when IMGUI_DISABLE_OBSOLETE_FUNCTIONS is set. It has been unnecessary and a no-op since 1.87 (it returns the same value as passed when used with a 1.87+ backend using io.AddKeyEvent() function). (#4921)
                            - IsKeyPressed(GetKeyIndex(ImGuiKey_XXX)) -> use IsKeyPressed(ImGuiKey_XXX)
@@ -1034,6 +1040,7 @@ CODE
 #pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"  // warning: zero as null pointer constant                    // some standard header variations use #define NULL 0
 #pragma clang diagnostic ignored "-Wdouble-promotion"               // warning: implicit conversion from 'float' to 'double' when passing argument to function  // using printf() is a misery with this as C++ va_arg ellipsis changes float to double.
 #pragma clang diagnostic ignored "-Wimplicit-int-float-conversion"  // warning: implicit conversion from 'xxx' to 'float' may lose precision
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"            // warning: 'xxx' is an unsafe pointer used for buffer access
 #elif defined(__GNUC__)
 // We disable -Wpragmas because GCC doesn't provide a has_warning equivalent and some forks/patches may not follow the warning/version association.
 #pragma GCC diagnostic ignored "-Wpragmas"                  // warning: unknown option after '#pragma GCC diagnostic' kind
@@ -1132,6 +1139,7 @@ static void             RenderWindowDecorations(ImGuiWindow* window, const ImRec
 static void             RenderWindowTitleBarContents(ImGuiWindow* window, const ImRect& title_bar_rect, const char* name, bool* p_open);
 static void             RenderDimmedBackgroundBehindWindow(ImGuiWindow* window, ImU32 col);
 static void             RenderDimmedBackgrounds();
+static void             SetLastItemDataForWindow(ImGuiWindow* window, const ImRect& rect);
 
 // Viewports
 const ImGuiID           IMGUI_VIEWPORT_DEFAULT_ID = 0x11111111; // Using an arbitrary constant instead of e.g. ImHashStr("ViewportDefault", 0); so it's easier to spot in the debugger. The exact value doesn't matter.
@@ -1204,7 +1212,7 @@ ImGuiStyle::ImGuiStyle()
     FrameBorderSize         = 0.0f;             // Thickness of border around frames. Generally set to 0.0f or 1.0f. Other values not well tested.
     ItemSpacing             = ImVec2(8,4);      // Horizontal and vertical spacing between widgets/lines
     ItemInnerSpacing        = ImVec2(4,4);      // Horizontal and vertical spacing between within elements of a composed widget (e.g. a slider and its label)
-    CellPadding             = ImVec2(4,2);      // Padding within a table cell. CellPadding.y may be altered between different rows.
+    CellPadding             = ImVec2(4,2);      // Padding within a table cell. Cellpadding.x is locked for entire table. CellPadding.y may be altered between different rows.
     TouchExtraPadding       = ImVec2(0,0);      // Expand reactive bounding box for touch-based system where touch position is not accurate enough. Unfortunately we don't sort widgets so priority on overlap will always be given to the first widget. So don't grow this too much!
     IndentSpacing           = 21.0f;            // Horizontal spacing when e.g. entering a tree node. Generally == (FontSize + FramePadding.x*2).
     ColumnsMinSpacing       = 6.0f;             // Minimum horizontal spacing between two columns. Preferably > (FramePadding.x + 1).
@@ -4524,6 +4532,27 @@ void ImGui::UpdateHoveredWindowAndCaptureFlags()
     io.WantTextInput = (g.WantTextInputNextFrame != -1) ? (g.WantTextInputNextFrame != 0) : false;
 }
 
+// Calling SetupDrawListSharedData() is followed by SetCurrentFont() which sets up the remaining data.
+static void SetupDrawListSharedData()
+{
+    ImGuiContext& g = *GImGui;
+    ImRect virtual_space(FLT_MAX, FLT_MAX, -FLT_MAX, -FLT_MAX);
+    for (ImGuiViewportP* viewport : g.Viewports)
+        virtual_space.Add(viewport->GetMainRect());
+    g.DrawListSharedData.ClipRectFullscreen = virtual_space.ToVec4();
+    g.DrawListSharedData.CurveTessellationTol = g.Style.CurveTessellationTol;
+    g.DrawListSharedData.SetCircleTessellationMaxError(g.Style.CircleTessellationMaxError);
+    g.DrawListSharedData.InitialFlags = ImDrawListFlags_None;
+    if (g.Style.AntiAliasedLines)
+        g.DrawListSharedData.InitialFlags |= ImDrawListFlags_AntiAliasedLines;
+    if (g.Style.AntiAliasedLinesUseTex && !(g.IO.Fonts->Flags & ImFontAtlasFlags_NoBakedLines))
+        g.DrawListSharedData.InitialFlags |= ImDrawListFlags_AntiAliasedLinesUseTex;
+    if (g.Style.AntiAliasedFill)
+        g.DrawListSharedData.InitialFlags |= ImDrawListFlags_AntiAliasedFill;
+    if (g.IO.BackendFlags & ImGuiBackendFlags_RendererHasVtxOffset)
+        g.DrawListSharedData.InitialFlags |= ImDrawListFlags_AllowVtxOffset;
+}
+
 void ImGui::NewFrame()
 {
     IM_ASSERT(GImGui != NULL && "No current context. Did you call ImGui::CreateContext() and ImGui::SetCurrentContext() ?");
@@ -4566,23 +4595,9 @@ void ImGui::NewFrame()
 
     // Setup current font and draw list shared data
     g.IO.Fonts->Locked = true;
+    SetupDrawListSharedData();
     SetCurrentFont(GetDefaultFont());
     IM_ASSERT(g.Font->IsLoaded());
-    ImRect virtual_space(FLT_MAX, FLT_MAX, -FLT_MAX, -FLT_MAX);
-    for (ImGuiViewportP* viewport : g.Viewports)
-        virtual_space.Add(viewport->GetMainRect());
-    g.DrawListSharedData.ClipRectFullscreen = virtual_space.ToVec4();
-    g.DrawListSharedData.CurveTessellationTol = g.Style.CurveTessellationTol;
-    g.DrawListSharedData.SetCircleTessellationMaxError(g.Style.CircleTessellationMaxError);
-    g.DrawListSharedData.InitialFlags = ImDrawListFlags_None;
-    if (g.Style.AntiAliasedLines)
-        g.DrawListSharedData.InitialFlags |= ImDrawListFlags_AntiAliasedLines;
-    if (g.Style.AntiAliasedLinesUseTex && !(g.Font->ContainerAtlas->Flags & ImFontAtlasFlags_NoBakedLines))
-        g.DrawListSharedData.InitialFlags |= ImDrawListFlags_AntiAliasedLinesUseTex;
-    if (g.Style.AntiAliasedFill)
-        g.DrawListSharedData.InitialFlags |= ImDrawListFlags_AntiAliasedFill;
-    if (g.IO.BackendFlags & ImGuiBackendFlags_RendererHasVtxOffset)
-        g.DrawListSharedData.InitialFlags |= ImDrawListFlags_AllowVtxOffset;
 
     // Mark rendering data as invalid to prevent user who may have a handle on it to use it.
     for (ImGuiViewportP* viewport : g.Viewports)
@@ -6978,7 +6993,7 @@ bool ImGui::Begin(const char* name, bool* p_open, ImGuiWindowFlags flags)
 
         // We fill last item data based on Title Bar/Tab, in order for IsItemHovered() and IsItemActive() to be usable after Begin().
         // This is useful to allow creating context menus on title bar only, etc.
-        SetLastItemData(window->MoveId, g.CurrentItemFlags, IsMouseHoveringRect(title_bar_rect.Min, title_bar_rect.Max, false) ? ImGuiItemStatusFlags_HoveredRect : 0, title_bar_rect);
+        SetLastItemDataForWindow(window, title_bar_rect);
 
         // [DEBUG]
 #ifndef IMGUI_DISABLE_DEBUG_TOOLS
@@ -6996,6 +7011,7 @@ bool ImGui::Begin(const char* name, bool* p_open, ImGuiWindowFlags flags)
     {
         // Append
         SetCurrentWindow(window);
+        SetLastItemDataForWindow(window, window->TitleBarRect());
     }
 
     PushClipRect(window->InnerClipRect.Min, window->InnerClipRect.Max, true);
@@ -7066,6 +7082,12 @@ bool ImGui::Begin(const char* name, bool* p_open, ImGuiWindowFlags flags)
 #endif
 
     return !window->SkipItems;
+}
+
+static void ImGui::SetLastItemDataForWindow(ImGuiWindow* window, const ImRect& rect)
+{
+    ImGuiContext& g = *GImGui;
+    SetLastItemData(window->MoveId, g.CurrentItemFlags, IsMouseHoveringRect(rect.Min, rect.Max, false) ? ImGuiItemStatusFlags_HoveredRect : 0, rect);
 }
 
 void ImGui::End()
@@ -12958,6 +12980,7 @@ bool ImGui::BeginDragDropSource(ImGuiDragDropFlags flags)
         source_drag_active = true;
     }
 
+    IM_ASSERT(g.DragDropWithinTarget == false); // Can't nest BeginDragDropSource() and BeginDragDropTarget()
     if (source_drag_active)
     {
         if (!g.DragDropActive)
@@ -13073,7 +13096,7 @@ bool ImGui::BeginDragDropTargetCustom(const ImRect& bb, ImGuiID id)
     if (window->SkipItems)
         return false;
 
-    IM_ASSERT(g.DragDropWithinTarget == false);
+    IM_ASSERT(g.DragDropWithinTarget == false && g.DragDropWithinSource == false); // Can't nest BeginDragDropSource() and BeginDragDropTarget()
     g.DragDropTargetRect = bb;
     g.DragDropTargetClipRect = window->ClipRect; // May want to be overriden by user depending on use case?
     g.DragDropTargetId = id;
@@ -13108,7 +13131,7 @@ bool ImGui::BeginDragDropTarget()
     if (g.DragDropPayload.SourceId == id)
         return false;
 
-    IM_ASSERT(g.DragDropWithinTarget == false);
+    IM_ASSERT(g.DragDropWithinTarget == false && g.DragDropWithinSource == false); // Can't nest BeginDragDropSource() and BeginDragDropTarget()
     g.DragDropTargetRect = display_rect;
     g.DragDropTargetClipRect = (g.LastItemData.StatusFlags & ImGuiItemStatusFlags_HasClipRect) ? g.LastItemData.ClipRect : window->ClipRect;
     g.DragDropTargetId = id;

@@ -1,70 +1,44 @@
-cmake_minimum_required(VERSION 3.20)
-project(FridayEngine VERSION 1.0)
+﻿# CMakeList.txt : CMake project for vulkan_guide, include source and define
+# project specific logic here.
+#
+cmake_minimum_required (VERSION 3.8)
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+project ("vulkan_guide")
 
-# Add Vulkan
+
 find_package(Vulkan REQUIRED)
 
-# Add glm
-add_subdirectory(Libraries/glm)
+add_subdirectory(libraries)
 
-# Include directories
-include_directories(
-    ${CMAKE_SOURCE_DIR}/libraries/glm
-    ${Vulkan_INCLUDE_DIR}
-    ${CMAKE_SOURCE_DIR}/engine/core
-    ${CMAKE_SOURCE_DIR}/engine/graphics
-    ${CMAKE_SOURCE_DIR}/engine/physics
-    ${CMAKE_SOURCE_DIR}/engine/custom-data-structures
-)
+set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin")
+set (CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin")
 
-# List source files
-file(GLOB_RECURSE ENGINE_CORE_SOURCES
-    "engine/core/*.cpp"
-    "engine/core/*.h"
-)
-file(GLOB_RECURSE ENGINE_GRAPHICS_SOURCES
-    "engine/graphics/*.cpp"
-    "engine/graphics/*.h"
-)
-file(GLOB_RECURSE ENGINE_PHYSICS_SOURCES
-    "engine/physics/*.cpp"
-    "engine/physics/*.h"
-)
-file(GLOB_RECURSE ENGINE_CUSTOM_DATA_STRUCTURES_SOURCES
-    "engine/custom-data-structures/*.cpp"
-    "engine/custom-data-structures/*.h"
-)
+add_subdirectory(engine)
 
-# Add executable
-add_executable(FridayEngine 
-    ${ENGINE_CORE_SOURCES}
-    ${ENGINE_GRAPHICS_SOURCES}
-    ${ENGINE_PHYSICS_SOURCES}
-    ${ENGINE_CUSTOM_DATA_STRUCTURES_SOURCES}
-)
-
-# Group source files by subdirectories under "Engine"
-foreach(_source IN ITEMS ${ENGINE_CORE_SOURCES} ${ENGINE_GRAPHICS_SOURCES} ${ENGINE_PHYSICS_SOURCES} ${ENGINE_CUSTOM_DATA_STRUCTURES_SOURCES})
-    get_filename_component(_source_path "${_source}" PATH)
-    file(RELATIVE_PATH _source_path_rel "${CMAKE_SOURCE_DIR}/engine" "${_source_path}")
-    string(REPLACE "/" "\\" _group_path "${_source_path_rel}")
-    source_group("engine\\${_group_path}" FILES "${_source}")
-endforeach()
-
-# Link libraries
-target_link_libraries(FridayEngine glm glfw imgui ${Vulkan_LIBRARIES})
+find_program(GLSL_VALIDATOR glslangValidator HINTS /usr/bin /usr/local/bin $ENV{VULKAN_SDK}/Bin/ $ENV{VULKAN_SDK}/Bin32/)
 
 
-# Allow debugging
-target_compile_options(${PROJECT_NAME} PUBLIC -ggdb)
 
-# Copy assets
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${CMAKE_SOURCE_DIR}/shaders
-    $<TARGET_FILE_DIR:FridayEngine>/shaders
-    COMMENT "Copy shaders to build tree"
-)
+
+file(GLOB_RECURSE GLSL_SOURCE_FILES
+    "${PROJECT_SOURCE_DIR}/shaders/*.frag"
+    "${PROJECT_SOURCE_DIR}/shaders/*.vert"
+    "${PROJECT_SOURCE_DIR}/shaders/*.comp"
+    )
+
+foreach(GLSL ${GLSL_SOURCE_FILES})
+  message(STATUS "BUILDING SHADER")
+  get_filename_component(FILE_NAME ${GLSL} NAME)
+  set(SPIRV "${PROJECT_SOURCE_DIR}/shaders/${FILE_NAME}.spv")
+  message(STATUS ${GLSL})
+  add_custom_command(
+    OUTPUT ${SPIRV}
+    COMMAND ${GLSL_VALIDATOR} -V ${GLSL} -o ${SPIRV}
+    DEPENDS ${GLSL})
+  list(APPEND SPIRV_BINARY_FILES ${SPIRV})
+endforeach(GLSL)
+
+add_custom_target(
+    Shaders 
+    DEPENDS ${SPIRV_BINARY_FILES}
+    )
