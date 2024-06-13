@@ -2,21 +2,17 @@
 //
 
 #include "Engine.h"
-#include <iostream>
+#include "vk_engine.h"
 
-int main() 
+int main(int argc, char* argv[])
 {
-    Engine instance;
-    try
-    {
-        instance.Run();
-    }
-    catch (const std::exception& e) 
-    {
-        std::cerr << e.what() << std::endl;
-        return EXIT_FAILURE;
-    }
+	VulkanEngine engine;
 
-    return EXIT_SUCCESS;
- }
-    
+	engine.init();
+
+	engine.run();
+
+	engine.cleanup();
+
+	return 0;
+}
